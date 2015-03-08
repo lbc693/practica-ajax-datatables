@@ -65,122 +65,233 @@ $(document).ready(function() {
                 return lista;
             }
         }, {
-            'data': 'idDoctor',
+            'data': 'id_clinica',
+            "visible": false
+        }, {
+            'data': 'id_doctor',
             /*añadimos las clases editarbtn y borrarbtn para procesar los eventos click de los botones. No lo hacemos mediante id ya que habrá más de un
             botón de edición o borrado*/
             'render': function(data) {
-                return '<a class="btn btn-primary editarbtn" href=http://localhost/php/editar.php?id_doctor=' + data + '>Editar</a><a class="btn btn-warning borrarbtn" href=http://localhost/php/borrar.php?id_doctor=' + data + '>Borrar</a>';
+                return '<a class="btn btn-primary editarbtn">Editar</a><a data-toggle="modal" data-target="#modalBorrarDoctor" class="btn btn-warning borrarbtn">Borrar</a>';
             }
         }]
     });
 
-    /*Creamos la función que muestre el formulario cuando hagamos click*/
     /*ojo, es necesario hacerlo con el método ON. Tanto por rendimiento como porque puede haber elementos (botones) que todavía no existan en el document.ready*/
+
+    /*Creamos la función que muestre el formulario cuando hagamos click*/
     $('#miTabla').on('click', '.editarbtn', function(e) {
         e.preventDefault();
         $('#tabla').fadeOut(100);
-        $('#formulario').fadeIn(100);
+        $('#bNuevoDoctor').fadeOut(100);
+        $('#editarDoctor').fadeIn(100);
 
         var nRow = $(this).parents('tr')[0];
         var aData = miTabla.row(nRow).data();
-        $('#idClinica').val(aData.idClinica);
-        $('#nombre').val(aData.nombre);
-        $('#numClinica').val(aData.numClinica);
-        $('#razonSocial').val(aData.razonSocial);
-        $('#cif').val(aData.cif);
-        $('#localidad').val(aData.localidad);
-        /*lo más cómodo para la provincia sería esto: (hemos convertido los values a mayúsculas mediante multicursor y CTRL + K + U (Sublime)*/
-        $('#provincia').val(aData.provincia);
-        /*Como hemos cambiado las option del select, más cómodo también para el envío de datos, esto que teníamos lo comentamos:*/
-        /*$('#provincia option').filter(function() {
-            return this.text.toLowerCase() === aData.provincia.toLowerCase();
-        }).attr('selected', true);*/
-        $('#id_tarifa').val(aData.idTarifa);
-        $('#direccion').val(aData.direccion);
-        $('#cp').val(aData.cp);
+        $('#idDoctor').val(aData.id_doctor);
+        $('#nombreEditarDoctor').val(aData.doctor);
+        $('#nColegiadoEditarDoctor').val(aData.numcolegiado);
+        cargarClinicas();
+        var str = aData.id_clinica;
+        /*Separo los id de las clinicas*/
+        str = str.split(",");
+        /*cargo el select con las que ya estaban*/
+        $('#clinicasEditarDoctor').val(str);
     });
 
-});
-
-/*Cargamos los clinicas para que aparezcan en el select:*/
-function cargarClinicas() {
-    $.ajax({
-        type: 'POST',
-        dataType: 'json',
-        url: 'php/cargar_clinicas.php',
-        success: function(data) {
-            $('#clinicasNuevoDoctor').empty();
-            $.each(data, function() {
-                $('#clinicasNuevoDoctor').append(
-                    $('<option ></option>').val(this.id_clinica).html(this.nombre)
-                );
-            });
-        }
+    /*Creamos la función que muestre el formulario cuando hagamos click*/
+    $('#miTabla').on('click', '.borrarbtn', function(e) {
+        e.preventDefault();
+        var nRow = $(this).parents('tr')[0];
+        var aData = miTabla.row(nRow).data();
+        id_doctor = aData.id_doctor;
+        nombre = aData.doctor;
     });
-}
 
-/*Formulario para CREAR NUEVO Doctor*/
-$('#formNuevoDoctor').validate({
-    rules: {
-        nombreNuevoDoctor: {
-            required: true,
-            spanishlettersspace: true
-        },
-        nColegiadoNuevoDoctor: {
-            digits: true
-        },
-        clinicasNuevoDoctor: {
-            required: true,
-            minlength: 1
-        }
-    },
-    submitHandler: function() {
-        nombreNuevoDoctor = $('#nombreNuevoDoctor').val();
-        nColegiadoNuevoDoctor = $('#nColegiadoNuevoDoctor').val();
-        clinicasNuevoDoctor = $('#clinicasNuevoDoctor').val();
+    /*Cargamos los clinicas para que aparezcan en el select:*/
+    function cargarClinicas() {
         $.ajax({
             type: 'POST',
             dataType: 'json',
-            url: 'php/insertar_doctor.php',
+            url: 'php/cargar_clinicas.php',
+            async: false,
+            success: function(data) {
+                $('#clinicasNuevoDoctor,#clinicasEditarDoctor').empty();
+                $.each(data, function() {
+                    $('#clinicasNuevoDoctor,#clinicasEditarDoctor').append(
+                        $('<option ></option>').val(this.id_clinica).html(this.nombre)
+                    );
+                });
+            }
+        });
+    }
+
+    /*Formulario para CREAR NUEVO Doctor*/
+    $('#formNuevoDoctor').validate({
+        rules: {
+            nombreNuevoDoctor: {
+                required: true,
+                spanishlettersspace: true
+            },
+            nColegiadoNuevoDoctor: {
+                digits: true
+            },
+            clinicasNuevoDoctor: {
+                required: true,
+                minlength: 1
+            }
+        },
+        submitHandler: function() {
+            nombreNuevoDoctor = $('#nombreNuevoDoctor').val();
+            nColegiadoNuevoDoctor = $('#nColegiadoNuevoDoctor').val();
+            clinicasNuevoDoctor = $('#clinicasNuevoDoctor').val();
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: 'php/insertar_doctor.php',
+                data: {
+                    nombreNuevoDoctor: nombreNuevoDoctor,
+                    nColegiadoNuevoDoctor: nColegiadoNuevoDoctor,
+                    clinicasNuevoDoctor: clinicasNuevoDoctor
+                },
+                error: function(xhr, status, error) {
+                    $.growl.error({
+                        title: "ERROR",
+                        message: "No se ha podido añadir el Doctor"
+                    });
+                },
+                success: function(data) {
+                    var $mitabla = $("#miTabla").dataTable({
+                        bRetrieve: true
+                    });
+                    $mitabla.fnDraw();
+                    if (data[0].estado == 0) {
+                        $.growl.notice({
+                            title: "OK",
+                            message: "Doctor añadido correctamente"
+                        });
+                    }
+                },
+                complete: {}
+            });
+            $('#tabla').fadeIn(100);
+            $('#bNuevoDoctor').fadeIn(100);
+            $('#nuevoDoctor').fadeOut(100);
+        }
+    });
+    /*Formulario para EDITAR un Doctor ya creado*/
+    $('#formEditarDoctor').validate({
+        rules: {
+            nombreEditarDoctor: {
+                required: true,
+                spanishlettersspace: true
+            },
+            nColegiadoEditarDoctor: {
+                digits: true
+            },
+            clinicasEditarDoctor: {
+                required: true,
+                minlength: 1
+            }
+        },
+        submitHandler: function() {
+            idDoctor = $('#idDoctor').val();
+            nColegiadoEditarDoctor = $('#nColegiadoEditarDoctor').val();
+            nColegiadoEditarDoctor = $('#nColegiadoEditarDoctor').val();
+            clinicasEditarDoctor = $('#clinicasEditarDoctor').val();
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: 'php/editar_doctor.php',
+                data: {
+                    id_doctor_e: id_doctor_e,
+                    nColegiadoEditarDoctor: nColegiadoEditarDoctor,
+                    nColegiadoEditarDoctor: nColegiadoEditarDoctor,
+                    clinicasEditarDoctor: clinicasEditarDoctor
+                },
+                error: function(xhr, status, error) {
+                    $.growl.error({
+                        title: "ERROR",
+                        message: "No se ha podido editar el Doctor"
+                    });
+                },
+                success: function(data) {
+                    var $mitabla = $("#miTabla").dataTable({
+                        bRetrieve: true
+                    });
+                    $mitabla.fnDraw();
+                    if (data[0].estado == 0) {
+                        $.growl.notice({
+                            title: "OK",
+                            message: "Doctor editado correctamente"
+                        });
+                    }
+                },
+                complete: {
+                    //si queremos hacer algo al terminar la petición ajax
+                }
+            });
+            $('#tabla').fadeIn(100);
+            $('#bNuevoDoctor').fadeIn(100);
+            $('#editarDoctor').fadeOut(100);
+        }
+    });
+    $('#bNuevoDoctor').click(function(e) {
+        e.preventDefault();
+        $('#nombreNuevoDoctor').val("");
+        $('#nColegiadoNuevoDoctor').val("");
+        $('#tabla').fadeOut(100);
+        $('#bNuevoDoctor').fadeOut(100);
+        $('#nuevoDoctor').fadeIn(100);
+        cargarClinicas();
+    });
+
+    /*Control de Ventana Modal BORRAR Doctor*/
+    $('#modalBorrarDoctor').on('click', '#bBorrarDoctor', function(e) {
+        $('#nombreBorrarDoctor').val(nombre);
+        $.ajax({
+            /*Visto en clase*/
+            /*En principio el type para api restful sería DELETE
+            pero no lo recogeríamos en $_REQUEST, así que queda como POST*/
+            type: 'POST',
+            dataType: 'json',
+            url: 'php/borrar_doctor.php',
+            /*Estos son los datos que queremos actualizar, en json:*/
             data: {
-                nombreNuevoDoctor: nombreNuevoDoctor,
-                nColegiadoNuevoDoctor: nColegiadoNuevoDoctor,
-                clinicasNuevoDoctor: clinicasNuevoDoctor
+                id_doctor: id_doctor
             },
             error: function(xhr, status, error) {
+                /*Mostraríamos alguna ventana de alerta con el error*/
+                /*Manejo del plugion de growl*/
+                /*https://github.com/ksylvest/jquery-growl*/
                 $.growl.error({
                     title: "ERROR",
-                    message: "No se ha podido añadir el Doctor"
+                    message: "No se ha podido borrar el Doctor"
                 });
             },
             success: function(data) {
+                //alert("Borrado Completado");
+                /*Visto en clase*/
+                /*obtenemos el mensaje del servidor, es un array!!!
+                var mensaje = (data["mensaje"]) //o data[0], en función del tipo de array!!
+                actualizamos datatables:
+                para volver a pedir vía ajax los datos de la tabla*/
                 var $mitabla = $("#miTabla").dataTable({
                     bRetrieve: true
                 });
                 $mitabla.fnDraw();
-                if (data[0].estado == 0) {
-                    $.growl.notice({
-                        title: "OK",
-                        message: "Doctor añadido correctamente"
-                    });
-                }
+                $.growl.notice({
+                    title: "OK",
+                    message: "Borrado de Doctor Completado"
+                });
             },
-            complete: {}
+            complete: {
+                /*si queremos hacer algo al terminar la petición ajax*/
+            }
         });
         $('#tabla').fadeIn(100);
         $('#bNuevoDoctor').fadeIn(100);
-        $('#nuevoDoctor').fadeOut(100);
-    }
-});
-
-$('#bNuevoDoctor').click(function(e) {
-    e.preventDefault();
-    $('#nombreNuevoDoctor').val("");
-    $('#nColegiadoNuevoDoctor').val("");
-    $('#tabla').fadeOut(100);
-    $('#bNuevoDoctor').fadeOut(100);
-    $('#nuevoDoctor').fadeIn(100);
-    cargarClinicas();
+    });
 });
 
 /* En http://www.datatables.net/reference/option/ hemos encontrado la ayuda necesaria
