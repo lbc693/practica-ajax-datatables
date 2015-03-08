@@ -106,6 +106,7 @@ $(document).ready(function() {
         var aData = miTabla.row(nRow).data();
         id_doctor = aData.id_doctor;
         nombre = aData.doctor;
+        $('#nombreBorrarDoctor').val(nombre);
     });
 
     /*Cargamos los clinicas para que aparezcan en el select:*/
@@ -196,7 +197,7 @@ $(document).ready(function() {
         },
         submitHandler: function() {
             idDoctor = $('#idDoctor').val();
-            nColegiadoEditarDoctor = $('#nColegiadoEditarDoctor').val();
+            nombreEditarDoctor = $('#nombreEditarDoctor').val();
             nColegiadoEditarDoctor = $('#nColegiadoEditarDoctor').val();
             clinicasEditarDoctor = $('#clinicasEditarDoctor').val();
             $.ajax({
@@ -204,8 +205,8 @@ $(document).ready(function() {
                 dataType: 'json',
                 url: 'php/editar_doctor.php',
                 data: {
-                    id_doctor_e: id_doctor_e,
-                    nColegiadoEditarDoctor: nColegiadoEditarDoctor,
+                    idDoctor: idDoctor,
+                    nombreEditarDoctor: nombreEditarDoctor,
                     nColegiadoEditarDoctor: nColegiadoEditarDoctor,
                     clinicasEditarDoctor: clinicasEditarDoctor
                 },
@@ -248,7 +249,6 @@ $(document).ready(function() {
 
     /*Control de Ventana Modal BORRAR Doctor*/
     $('#modalBorrarDoctor').on('click', '#bBorrarDoctor', function(e) {
-        $('#nombreBorrarDoctor').val(nombre);
         $.ajax({
             /*Visto en clase*/
             /*En principio el type para api restful sería DELETE

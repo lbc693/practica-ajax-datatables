@@ -1,6 +1,6 @@
 <?php
-$user = "root";
-$password = "root";
+$user = "luisbaron_luisus";
+$password = "luispw";
 $db = "datatables";
 $server = "localhost";
 ?>

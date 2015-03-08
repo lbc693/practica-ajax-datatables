@@ -19,31 +19,37 @@ if (!mysql_select_db($db, $gaSql['link'])) {
 	fatal_error('Could not select database ');
 }
 mysql_query('SET names utf8');
-//$_REQUEST['id_doctor'] = 1;
-if (isset($_REQUEST['id_doctor'])) {
-// param was set in the query string
-if (empty($_REQUEST['id_doctor'])) {
-return "El parámetro id_doctor viene vacio!";
+
+$id_doctor = $_POST["idDoctor"];
+$nombre = $_POST["nombreEditarDoctor"];
+$numcolegiado = $_POST["nColegiadoEditarDoctor"];
+$clinicas = $_POST["clinicasEditarDoctor"];
+if($clinicas){
+$query = "DELETE FROM clinica_doctor WHERE id_doctor=" . $id_doctor;
+$query_res = mysql_query($query);
 }
-$id_doctor = $_REQUEST['id_doctor'];
+for ($i=0;$i<count($clinicas);$i++)
+{
+$queryCD = "INSERT INTO clinica_doctor (id_doctor,id_clinica) VALUES(
+". $id_doctor . ",
+" . $clinicas[$i] . ")" ;
+$query_res = mysql_query($queryCD);
 }
-/*
-* SQL queries
-* Get data to display
-*/
-$query = "DELETE FROM doctores WHERE id_doctor=" . $id_doctor;
+/* Consulta UPDATE */
+$query = "UPDATE doctores SET
+nombre = '" . $nombre . "',
+numcolegiado = '" . $numcolegiado . "'
+WHERE id_doctor = " . $id_doctor;
+/*En función del resultado correcto o no, mostraremos el mensaje que corresponda*/
 $query_res = mysql_query($query);
 // Comprobar el resultado
 if (!$query_res) {
-if (mysql_errno() == 1451) {
-$mensaje = "Imposible Borrar Doctor. Tiene prescripciones o albaranes definidos, borre primero prescripciones o albaranes";
-$estado = mysql_errno();
-} else {
-$mensaje = 'Error en la consulta: ' . mysql_error() . "\n";
+$mensaje = 'Error en la consulta: ' .mysql_error() ."\n";
 $estado = mysql_errno();
 }
-} else {
-$mensaje = "Borrado correcto";
+else
+{
+$mensaje = "Actualización correcta";
 $estado = 0;
 }
 $resultado = array();
