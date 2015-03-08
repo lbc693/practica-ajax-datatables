@@ -169,7 +169,7 @@ $('#formNuevoDoctor').validate({
         });
         $('#tabla').fadeIn(100);
         $('#bNuevoDoctor').fadeIn(100);
-        $('#formNuevoDoctor').fadeOut(100);
+        $('#nuevoDoctor').fadeOut(100);
     }
 });
 
@@ -179,7 +179,7 @@ $('#bNuevoDoctor').click(function(e) {
     $('#nColegiadoNuevoDoctor').val("");
     $('#tabla').fadeOut(100);
     $('#bNuevoDoctor').fadeOut(100);
-    $('#formNuevoDoctor').fadeIn(100);
+    $('#nuevoDoctor').fadeIn(100);
     cargarClinicas();
 });
 
