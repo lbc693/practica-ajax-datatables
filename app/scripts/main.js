@@ -34,7 +34,15 @@ $(document).ready(function() {
         }, {
             'data': 'numcolegiado'
         }, {
-            'data': 'clinica'
+            'data': 'clinica',
+            'render': function(data) {
+                clinicas = data.split(', ');
+                var lista = "";
+                $.each(clinicas, function(ind, clinica) {
+                    lista = lista + '<li>' + clinica + '</li><br>';
+                });
+                return lista;
+            }
         }, {
             'data': 'idDoctor',
             /*añadimos las clases editarbtn y borrarbtn para procesar los eventos click de los botones. No lo hacemos mediante id ya que habrá más de un
