@@ -34,13 +34,14 @@ $columns = array(
     array( 'db' => 'numcolegiado',   'dt' => 'numcolegiado' ),
     array( 'db' => 'clinica',     'dt' => 'clinica' )
 );
- 
+
+include("mysql.php" );
 // SQL server connection information
 $sql_details = array(
-    'user' => 'root',
-    'pass' => 'root',
-    'db'   => 'datatables',
-    'host' => 'localhost'
+    'user' => $user,
+    'pass' => $password,
+    'db'   => $db,
+    'host' => $server
 );
  
  

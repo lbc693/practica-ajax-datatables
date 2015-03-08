@@ -1,5 +1,26 @@
 console.log('\'Allo \'Allo!');
 'use strict';
+
+/*Validacion solo letras alfabeto español*/
+$.validator.addMethod("spanishletters", function(value, element) {
+    return this.optional(element) || /^[a-zA-ZñÑáéíóúÁÉÍÓÚ]+$/i.test(value);
+}, "Por favor, solo letras");
+/*Validacion solo letras y espacios alfabeto español*/
+$.validator.addMethod("spanishlettersspace", function(value, element) {
+    return this.optional(element) || /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$/i.test(value);
+}, "Por favor, solo letras y espacios");
+/*
+ * Translated default messages for the jQuery validation plugin.
+ * Locale: ES (Spanish; Español)
+ */
+jQuery.extend(jQuery.validator.messages, {
+    required: "Este campo es obligatorio",
+    spanishletters: "Introduzca solo letras",
+    spanishlettersspace: "Introduzca solo letras y espacios",
+    digits: "Introduzca sólo carácteres numéricos",
+    minlength: "Es necesario seleccionar al menos una clinica"
+});
+
 $(document).ready(function() {
     var miTabla = $('#miTabla').DataTable({
         'processing': true,
@@ -98,11 +119,66 @@ function cargarClinicas() {
     });
 }
 
+/*Formulario para CREAR NUEVO Doctor*/
+$('#formNuevoDoctor').validate({
+    rules: {
+        nombreNuevoDoctor: {
+            required: true,
+            spanishlettersspace: true
+        },
+        nColegiadoNuevoDoctor: {
+            digits: true
+        },
+        clinicasNuevoDoctor: {
+            required: true,
+            minlength: 1
+        }
+    },
+    submitHandler: function() {
+        nombreNuevoDoctor = $('#nombreNuevoDoctor').val();
+        nColegiadoNuevoDoctor = $('#nColegiadoNuevoDoctor').val();
+        clinicasNuevoDoctor = $('#clinicasNuevoDoctor').val();
+        $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            url: 'php/insertar_doctor.php',
+            data: {
+                nombreNuevoDoctor: nombreNuevoDoctor,
+                nColegiadoNuevoDoctor: nColegiadoNuevoDoctor,
+                clinicasNuevoDoctor: clinicasNuevoDoctor
+            },
+            error: function(xhr, status, error) {
+                $.growl.error({
+                    title: "ERROR",
+                    message: "No se ha podido añadir el Doctor"
+                });
+            },
+            success: function(data) {
+                var $mitabla = $("#miTabla").dataTable({
+                    bRetrieve: true
+                });
+                $mitabla.fnDraw();
+                if (data[0].estado == 0) {
+                    $.growl.notice({
+                        title: "OK",
+                        message: "Doctor añadido correctamente"
+                    });
+                }
+            },
+            complete: {}
+        });
+        $('#tabla').fadeIn(100);
+        $('#bNuevoDoctor').fadeIn(100);
+        $('#formNuevoDoctor').fadeOut(100);
+    }
+});
+
 $('#bNuevoDoctor').click(function(e) {
     e.preventDefault();
     $('#nombreNuevoDoctor').val("");
     $('#nColegiadoNuevoDoctor').val("");
     $('#tabla').fadeOut(100);
+    $('#bNuevoDoctor').fadeOut(100);
     $('#formNuevoDoctor').fadeIn(100);
     cargarClinicas();
 });
