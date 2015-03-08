@@ -81,6 +81,32 @@ $(document).ready(function() {
 
 });
 
+/*Cargamos los clinicas para que aparezcan en el select:*/
+function cargarClinicas() {
+    $.ajax({
+        type: 'POST',
+        dataType: 'json',
+        url: 'php/cargar_clinicas.php',
+        success: function(data) {
+            $('#clinicasNuevoDoctor').empty();
+            $.each(data, function() {
+                $('#clinicasNuevoDoctor').append(
+                    $('<option ></option>').val(this.id_clinica).html(this.nombre)
+                );
+            });
+        }
+    });
+}
+
+$('#bNuevoDoctor').click(function(e) {
+    e.preventDefault();
+    $('#nombreNuevoDoctor').val("");
+    $('#nColegiadoNuevoDoctor').val("");
+    $('#tabla').fadeOut(100);
+    $('#formNuevoDoctor').fadeIn(100);
+    cargarClinicas();
+});
+
 /* En http://www.datatables.net/reference/option/ hemos encontrado la ayuda necesaria
 para utilizar el API de datatables para el render de los botones */
 /* Para renderizar los botones según bootstrap, la url es esta: 

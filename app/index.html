@@ -25,8 +25,14 @@
                 <strong>outdated</strong>browser. Please
                 <a href="http://browsehappy.com/">upgrade your browser</a>to improve your experience.
               </p><![endif]-->
+
     <div class="container-fluid">
-        <div id="tabla" class="row">
+        <div class="row-fluid">
+            <h1>Doctores</h1>
+            <button id="bNuevoDoctor" type="button" class="btn">Nuevo Doctor</button>
+        </div>
+        <div class="spacer50"></div>
+        <div id="tabla" class="row-fluid">
             <div class="col-md-12">
                 <table id="miTabla" class="table">
                     <thead>
@@ -46,6 +52,42 @@
             </div>
         </div>
     </div>
+
+    <div id="formNuevoDoctor" class="row">
+        <div class="col-md-4 col-md-offset-3">
+            <form class="form-horizontal" id="form_crear" name="form_crear" method="post" action="#">
+                <div>
+                    <h2>Nuevo Doctor</h2>
+                    <div class="form-group">
+                        <label for="nombreNuevoDoctor" class="col-sm-2 control-label">Nombre<span class="required">&nbsp;*</span>:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="nombreNuevoDoctor" name="nombreNuevoDoctor" placeholder="Introduce el nombre del doctor">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="nColegiadoNuevoDoctor" class="col-sm-2 control-label">Nº Colegiado:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="nColegiadoNuevoDoctor" name="nColegiadoNuevoDoctor" placehonColegiadoNuevoDoctorlder="Introduce el número de colegiado">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="clinicasNuevoDoctor" class="col-sm-2 control-label">Nombre Clinica/s<span class="required">&nbsp;*</span>:</label>
+                        <div class="col-sm-10">
+                            <select multiple id="clinicasNuevoDoctor" name="clinicasNuevoDoctor">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-10 col-sm-offset-2">
+                            <button type="submit" class="btn btn-primary">Enviar</button>
+                            <a class="btn btn-danger" href="index.html" role="button">Cancelar</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- build:js(.) scripts/vendor.js -->
     <!-- bower:js -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
